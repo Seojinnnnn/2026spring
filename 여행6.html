@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리의 맞춤 여행 기록장</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+        body {
+            font-family: 'Jua', sans-serif;
+            background-color: #ffffff;
+            color: #000;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { width: 100%; max-width: 900px; }
+
+        .summary-section {
+            border: 3px solid #000;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 40px;
+            box-shadow: 6px 6px 0px #000;
+            background-color: #fff;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .summary-item { display: flex; flex-direction: column; gap: 5px; }
+
+        input, textarea {
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        
+        input:focus, textarea:focus { background-color: #fffcd6; }
+
+        .weather-box {
+            background-color: #000;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .daily-plan-section { margin-bottom: 50px; }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 3px dashed #000;
+            padding-bottom: 10px;
+        }
+
+        .plan-header h2 { margin: 0; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 3px solid #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        th { background-color: #f0f0f0; border-bottom: 3px solid #000; padding: 12px; }
+        td { border-bottom: 2px solid #000; padding: 10px; background-color: #fff; }
+
+        .time-input { width: 100px; text-align: center; }
+        .content-input { width: 95%; }
+        
+        /* 📸 사진 영역 스타일 업그레이드 */
+        .photo-cell {
+            width: 100%;
+            height: 100px; /* 사진이 잘 보이게 높이를 살짝 키웠어요 */
+            border: 2px dashed #000;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background-color: #fafafa;
+            transition: 0.2s;
+            overflow: hidden; /* 사진이 네모 상자 밖으로 삐져나가지 않게 막아줍니다 */
+            padding: 0; /* 내부 여백 제거 */
+        }
+        
+        .photo-cell:hover { background-color: #eee; }
+
+        /* 미리보기 사진이 상자에 꽉 차게 예쁘게 들어가는 마법 */
+        .photo-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 비율이 찌그러지지 않게 잘라내며 꽉 채우기 */
+        }
+
+        .add-btn {
+            background-color: #fff;
+            border: 3px solid #000;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        .add-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 30px;">✈️ 우리의 여행 아카이브</h1>
+
+        <div class="summary-section">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <label>📍 여행 장소</label>
+                    <input type="text" id="location-input" placeholder="예: 런던, 서울, 도쿄" onchange="fetchWeather()">
+                </div>
+                <div class="summary-item">
+                    <label>☁️ 현재 날씨 정보</label>
+                    <div class="weather-box" id="weather-info">장소를 입력 후 엔터를 쳐보세요!</div>
+                </div>
+                <div class="summary-item">
+                    <label>📅 전체 일정</label>
+                    <div style="display: flex; gap: 5px; align-items: center;">
+                        <input type="date" id="start-date" onchange="generateDailyPlans()"> 
+                        <span>~</span> 
+                        <input type="date" id="end-date" onchange="generateDailyPlans()">
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <label>📝 주요 정보 (숙소, 항공편 등)</label>
+                    <textarea rows="2" placeholder="체크인 시간 등 중요한 정보"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div id="daily-plans-container">
+            <div style="text-align: center; color: #666; margin-top: 50px;">
+                👆 상단에서 <strong>전체 일정(시작/종료 날짜)</strong>을 선택하시면<br>날짜별 스케줄 표가 자동으로 생성됩니다!
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ☁️ 날씨 API
+        async function fetchWeather() {
+            const locationInput = document.getElementById('location-input').value;
+            const weatherBox = document.getElementById('weather-info');
+            if (!locationInput) return;
+
+            weatherBox.innerHTML = "⏳ 날씨 검색 중...";
+            try {
+                const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${locationInput}&count=1&language=ko`;
+                const geoResponse = await fetch(geoUrl);
+                const geoData = await geoResponse.json();
+
+                if (!geoData.results || geoData.results.length === 0) {
+                    weatherBox.innerHTML = "❌ 장소를 찾지 못했어요.";
+                    return;
+                }
+
+                const lat = geoData.results[0].latitude;
+                const lon = geoData.results[0].longitude;
+
+                const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+                const weatherResponse = await fetch(weatherUrl);
+                const weatherData = await weatherResponse.json();
+
+                const temp = weatherData.current_weather.temperature;
+                const code = weatherData.current_weather.weathercode;
+
+                let icon = "☁️";
+                if (code === 0) icon = "☀️ 맑음";
+                else if (code >= 1 && code <= 3) icon = "⛅ 구름 조금";
+                else if (code >= 51 && code <= 67) icon = "🌧️ 비";
+                else if (code >= 71 && code <= 77) icon = "❄️ 눈";
+                else if (code >= 95 && code <= 99) icon = "🌩️ 뇌우";
+
+                weatherBox.innerHTML = `${icon} <br> 기온: ${temp}°C`;
+            } catch (error) {
+                weatherBox.innerHTML = "⚠️ 날씨 서버 오류";
+            }
+        }
+
+        // 📅 표 생성기
+        function generateDailyPlans() {
+            const startDateInput = document.getElementById('start-date').value;
+            const endDateInput = document.getElementById('end-date').value;
+            const container = document.getElementById('daily-plans-container');
+
+            if (!startDateInput || !endDateInput) return;
+
+            const startDate = new Date(startDateInput);
+            const endDate = new Date(endDateInput);
+
+            if (startDate > endDate) {
+                alert("종료 날짜가 시작 날짜보다 빠를 수 없어요! 😅");
+                return;
+            }
+
+            container.innerHTML = '';
+            let currentDate = new Date(startDate);
+            let dayCount = 1;
+
+            while (currentDate <= endDate) {
+                const month = currentDate.getMonth() + 1;
+                const date = currentDate.getDate();
+                const tbodyId = `tbody-day-${dayCount}`;
+
+                const planSection = document.createElement('div');
+                planSection.className = 'daily-plan-section';
+                planSection.innerHTML = `
+                    <div class="plan-header">
+                        <h2>📅 DAY ${dayCount} (${month}월 ${date}일)</h2>
+                        <button class="add-btn" onclick="addTableRow('${tbodyId}')">+ 일정 추가</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">시간</th>
+                                <th style="width: 35%;">장소 및 활동</th>
+                                <th style="width: 25%;">메모</th>
+                                <th style="width: 25%;">사진/기록</th>
+                            </tr>
+                        </thead>
+                        <tbody id="${tbodyId}">
+                        </tbody>
+                    </table>
+                `;
+                container.appendChild(planSection);
+                addTableRow(tbodyId);
+
+                currentDate.setDate(currentDate.getDate() + 1);
+                dayCount++;
+            }
+        }
+
+        // --- 📸 진짜 사진을 띄워주는 새로운 마법 로직 ---
+        function addTableRow(tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+
+            // 각 칸마다 고유한 이름을 지어줍니다 (파일 업로드 창과 보여주는 창을 짝지어주기 위해)
+            const uniqueId = Math.random().toString(36).substr(2, 9);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="time" class="time-input"></td>
+                <td><input type="text" class="content-input" placeholder="무엇을 하나요?"></td>
+                <td><textarea style="width:90%" rows="2" placeholder="비용, 꿀팁"></textarea></td>
+                <td>
+                    <input type="file" id="file-${uniqueId}" accept="image/*" style="display: none;" onchange="previewImage(event, 'preview-${uniqueId}')">
+                    
+                    <div class="photo-cell" id="preview-${uniqueId}" onclick="document.getElementById('file-${uniqueId}').click()">
+                        📷 클릭해서 사진 추가
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // 선택한 파일을 읽어서 네모 상자 안에 그림으로 샥! 바꿔주는 함수
+        function previewImage(event, previewBoxId) {
+            const file = event.target.files[0];
+            if (!file) return; // 파일 선택을 취소하면 아무것도 안 함
+
+            const reader = new FileReader(); // 브라우저 안의 파일 읽기 요정
+            
+            // 요정이 파일을 다 읽으면 할 일 지정
+            reader.onload = function(e) {
+                const previewBox = document.getElementById(previewBoxId);
+                // 네모 상자 안의 글씨를 지우고, 진짜 이미지 태그(img)로 교체합니다!
+                previewBox.innerHTML = `<img src="${e.target.result}" alt="여행 사진">`;
+                previewBox.style.border = 'none'; // 예뻐 보이게 점선 테두리도 없애줍니다
+            };
+            
+            // 요정에게 파일을 그림 주소(URL) 형태로 읽으라고 명령
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
