@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시험 문제 생성기</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; background-color: #f0f2f5; }
+        .container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 150px; margin: 10px 0; padding: 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 8px; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        #result { margin-top: 20px; white-space: pre-wrap; line-height: 1.6; }
+        .q-item { background: #e9ecef; padding: 10px; margin-bottom: 10px; border-left: 4px solid #007bff; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🧠 예상 문제 생성기</h2>
+        <p>자료를 아래에 붙여넣으세요.</p>
+        <textarea id="dataInput" placeholder="여기에 공부한 내용을 넣어보세요..."></textarea>
+        <button onclick="makeQuiz()">문제 만들기</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function makeQuiz() {
+            const input = document.getElementById('dataInput').value;
+            const resultDiv = document.getElementById('result');
+            
+            if(!input) { alert('내용을 입력해주세요!'); return; }
+
+            resultDiv.innerHTML = "<strong>생성된 예상 문제:</strong><br><br>";
+            
+            // 바이브 코딩용 가짜 로직 (나중에 여기에 진짜 AI API를 연결할 수 있어요)
+            const questions = [
+                "Q1. 위 자료에서 가장 중요한 핵심 키워드는 무엇인가요?",
+                "Q2. 본문의 내용을 한 문장으로 요약한다면?",
+                "Q3. 이 개념이 실제 시험에 나온다면 어떤 응용 문제가 나올까요?"
+            ];
+
+            questions.forEach(q => {
+                const div = document.createElement('div');
+                div.className = 'q-item';
+                div.innerText = q;
+                resultDiv.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
