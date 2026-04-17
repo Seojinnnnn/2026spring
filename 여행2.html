@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리의 여행 아카이브</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        
+        body {
+            font-family: 'Jua', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            border-bottom: 3px dashed #000;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* 일정표 타임라인 뼈대 */
+        .timeline {
+            border-left: 4px solid #000;
+            padding-left: 25px;
+            margin-left: 10px;
+            position: relative;
+        }
+
+        /* 각 일정 카드 */
+        .card {
+            background-color: #fff;
+            border: 3px solid #000;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 6px 6px 0px #000;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        /* 타임라인 동그라미 포인트 */
+        .card::before {
+            content: '';
+            position: absolute;
+            left: -40px; /* 타임라인 선 위로 오도록 위치 조정 */
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border: 4px solid #000;
+            border-radius: 50%;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* 기간 입력란 스타일 */
+        .time-range {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        input, textarea {
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: inherit;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            background-color: #f9f9f9;
+        }
+
+        .weather-badge {
+            background: #000;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: auto; /* 오른쪽 끝으로 밀어내기 */
+        }
+
+        .place-input {
+            width: 100%;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .place-info {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 15px;
+            padding-left: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        .photo-area {
+            border: 2px dashed #000;
+            border-radius: 8px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: #fafafa;
+            transition: background-color 0.2s;
+        }
+
+        .photo-area:hover {
+            background-color: #f0f0f0;
+        }
+
+        button.add-btn {
+            background-color: #fff;
+            border: 3px solid #000;
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            margin: 20px auto 40px;
+            display: block;
+        }
+
+        button.add-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>✈️ 우리의 여행 계획표</h1>
+
+        <div class="timeline">
+            <div class="card">
+                <div class="card-header">
+                    <div class="time-range">
+                        <input type="date" title="시작 날짜">
+                        <input type="time" title="시작 시간">
+                        <span>~</span>
+                        <input type="date" title="종료 날짜">
+                        <input type="time" title="종료 시간">
+                    </div>
+                    <div class="weather-badge">☀️ 맑음 24°C</div>
+                </div>
+                
+                <input type="text" class="place-input" placeholder="어디서 무엇을 하나요?">
+                <div class="place-info">📍 자동완성: 장소에 대한 기본 정보가 이곳에 뜹니다.</div>
+                
+                <textarea rows="3" placeholder="추가 메모를 자유롭게 적어보세요!"></textarea>
+                
+                <div class="photo-area">
+                    <span>📷 사진 추가 및 꾸미기</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="time-range">
+                        <input type="date">
+                        <input type="time">
+                        <span>~</span>
+                        <input type="date">
+                        <input type="time">
+                    </div>
+                    <div class="weather-badge">☁️ 흐림 20°C</div>
+                </div>
+                
+                <input type="text" class="place-input" placeholder="다음 일정은요?">
+                <div class="place-info">📍 자동완성: 장소에 대한 기본 정보가 이곳에 뜹니다.</div>
+                
+                <textarea rows="3" placeholder="이곳에서 무엇을 할지 적어주세요."></textarea>
+                
+                <div class="photo-area">
+                    <span>📷 사진 추가 및 꾸미기</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="add-btn">+ 새 일정 추가하기</button>
+    </div>
+
+</body>
+</html>
